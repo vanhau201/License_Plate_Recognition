@@ -7,7 +7,8 @@ export let endpoints = {
     "checkIn": "api/checkin/",
     "checkOut": "api/checkout/",
     "updateCheckIn": "api/update-checkin/",
-    "updateCheckOut": "api/update-checkout/"
+    "updateCheckOut": "api/update-checkout/",
+    "delete": (id) => `api/delete/${id}/`
 }
 
 export default axios.create({

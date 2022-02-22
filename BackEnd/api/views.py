@@ -49,13 +49,15 @@ def Routes(request):
     domain = request.build_absolute_uri()
 
     routers = {
-        "List License Plate": domain + "list-license-plate/",
-        "Token":  domain + "token/",
-        "Refresh Token": domain + "token/refresh/",
-        "Check In": domain + "checkin/",
-        "Check Out": domain + "checkout/",
-        "Update Check In": domain + "update-checkin/",
-        "Update Check Out": domain + "update-checkout/"
+        "List License Plate": "/list-license-plate/",
+        "Token": "/token/",
+        "Refresh Token": "/token/refresh/",
+        "Register" : "register",
+        "Check In": "/checkin/",
+        "Check Out": "/checkout/",
+        "Update Check In" :"/update-checkin/",
+        "Update Check Out" :"/update-checkout/",
+        "Delete": "/delete/<str:pk>/"
     }
 
     return Response(routers)
@@ -203,7 +205,7 @@ def CheckOut(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST"])
+@api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def DeleteLicensePlate(request, pk):
     lisencePlate = LisencePlate.objects.filter(

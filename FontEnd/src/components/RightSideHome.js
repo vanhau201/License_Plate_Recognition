@@ -3,8 +3,9 @@ import "../styles/RightSideHome.css"
 import ReactPaginate from 'react-paginate';
 import Apis, { endpoints } from '../configs/Apis';
 import { useSelector } from 'react-redux';
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Modal from './Modal';
 
 function RightSideHome({ licensePlate }) {
     const tokens = useSelector(state => state.authTokens)
@@ -13,6 +14,8 @@ function RightSideHome({ licensePlate }) {
     const [search, setSearch] = useState()
     const [totalPage, setTotalPage] = useState()
     const [page, setPage] = useState()
+    const [dataRepair, setDataRepair] = useState()
+
 
 
 
@@ -56,22 +59,29 @@ function RightSideHome({ licensePlate }) {
         setPage(e.selected + 1)
     }
 
-    const handleDelete = (id) => {
-        console.log(id)
-        confirmAlert({
-            title: 'Confirm delete',
-            message: 'Are you sure to delete this ?',
-            buttons: [
-                {
-                    label: 'Yes',
-                    onClick: () => alert('Click Yes')
-                },
-                {
-                    label: 'No',
-                    onClick: () => alert('Click No')
+    const handleDelete = async (id) => {
+        try {
+            const res = await Apis.delete(endpoints['delete'](id), {
+                headers: {
+                    "Authorization": `Bearer ${tokens.access}`
                 }
-            ]
-        });
+            })
+            if (res.status === 200) {
+                loadData()
+                toast.success("Delete success !")
+
+            }
+        }
+        catch {
+            toast.error("Error !")
+        }
+
+    }
+
+    const handleRepair = (status) => {
+        if (status === 200) {
+            loadData()
+        }
     }
     return (
         <>
@@ -85,7 +95,7 @@ function RightSideHome({ licensePlate }) {
                 </div>
                 <div className='col-md-7 search'>
                     <form action="" onSubmit={handleSearch}>
-                        <input id="txtSearch" name='search' type="text" placeholder="Enter license plate number . . ." />
+                        <input id="txtSearch" name='search' type="text" placeholder="Enter license plate number ..." />
                         <button id='btnSearch' type='submit'><i className="fas fa-search"></i></button>
                     </form>
 
@@ -118,7 +128,7 @@ function RightSideHome({ licensePlate }) {
                                     <td className="col-1">{d.status ? "True" : "False"}</td>
                                     <td className="col-4">{d.created_date}</td>
                                     <td className="col-2">
-                                        <button id="btnRepair"><i className="fas fa-tools"></i></button>
+                                        <button id="btnRepair" data-toggle="modal" data-target="#staticBackdrop" onClick={() => setDataRepair(d)}><i className="fas fa-tools"></i></button>
                                         <button id="btnRemove" onClick={() => handleDelete(d.id)}><i className="far fa-trash-alt"></i></button>
                                     </td>
                                 </tr>
@@ -155,6 +165,12 @@ function RightSideHome({ licensePlate }) {
                     onPageChange={handleClickPaginate}
                 />
             </div>
+
+            {dataRepair ? <Modal data={dataRepair} onRepair={handleRepair} /> : ""}
+
+
+
+            <ToastContainer />
         </>
     )
 

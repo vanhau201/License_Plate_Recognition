@@ -1,0 +1,14 @@
+.modal-dialog{
+    max-width: 800px !important;
+}
+.txtResult{
+    width: 95%;
+    padding: 2px 5px;
+}
+.selectStatus{
+    padding: 2px 5px;
+}
+#tableRepair thead tr {
+    width: 100%;
+
+}
