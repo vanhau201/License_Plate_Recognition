@@ -1,0 +1,67 @@
+#fileVideo{
+    display: none;
+}
+
+#btnLoadVideo,
+#btnStartWebCam,
+#btnStopWebCam {
+    cursor: pointer;
+    border: none;
+    padding: 4px 30px;
+    margin-right: 10px;
+    background-color: crimson;
+    color: white;
+    border-radius: 4px;
+    margin-bottom: 0.3rem;
+}
+
+#video {
+    width: 100%;
+    height: 370px;
+}
+
+#imageBienso{
+    width: 100%;
+    height: 160px;
+}
+
+.txtConfidence{
+    text-align: center;
+}
+
+#selectType {
+    padding: 3px 0 3px 2px;
+    width: 50%;
+    border-radius: 5px;
+}
+
+#txtResult {
+    padding: 2px 5px;
+    border-radius: 5px;
+    border: 1px solid black;
+    width: 50%;
+    margin-right: 5px;
+    /* outline: none; */
+}
+
+#btnUpdate {
+    padding: 4px 20px;
+    border: none;
+    background-color: crimson;
+    color: white;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+}
+
+#btnPredict {
+    width: 80%;
+    padding: 6px 0;
+    border: none;
+    background-color: rgb(16, 152, 43);
+    color: white;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+    /* margin-top: 5px; */
+}

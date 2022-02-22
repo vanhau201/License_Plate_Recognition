@@ -1,0 +1,125 @@
+/* .filter{
+    display: flex;
+    justify-content: space-between;
+}
+.filter__display{
+    width: 30%;
+}
+.filter__show{
+    width: 70%;
+} */
+
+#selectData {
+    padding: 3px 0 3px 2px;
+    width: 70px;
+    border-radius: 5px;
+}
+
+#txtSearch {
+    
+    width: 80%;
+    padding: 3px 40px 3px 6px;
+    border: 1px solid black;
+    border-radius: 5px;
+    
+}
+
+.search{
+    text-align: right;
+}
+.table{
+    font-size: 12px;
+}
+.table img {
+    width: 95%;
+    height: auto;
+}
+.table td{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#scroll_table {
+    display: block;
+    height: 480px;
+    overflow-y: scroll;
+}
+
+.table thead {
+    background-color: rgb(52, 58, 64);
+}
+
+.table thead tr {
+    width: 98%;
+
+}
+
+#btnRemove {
+    padding: 6px 10px;
+    border: none;
+    background-color: crimson;
+    color: white;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#btnRepair {
+    padding: 6px 10px;
+    border: none;
+    background-color: rgb(16, 152, 43);
+    color: white;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+.pagination{
+   display: flex;
+   justify-content: center;
+   font-size: 13px;
+}
+
+/* ----- */
+.page-item.active .page-link{
+    background-color: rgb(52, 58, 64);
+    border: none;
+    /* color: white; */
+}
+.page-link{
+    color: black;
+}
+.page-link:focus{
+   box-shadow: none;
+    
+}
+
+#btnSearch{
+    margin-left: -25px;
+    border: none;
+    background-color:inherit;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    margin-right: 5px;
+    font-size: 20px;
+    
+}
+
+#btnSearch i{
+    color: black;
+}
+
+.react-confirm-alert-overlay{
+    background-color: inherit !important;
+}
+.react-confirm-alert-button-group{
+    justify-content: center !important;
+}
+.react-confirm-alert-body{
+    text-align: center !important;
+}
