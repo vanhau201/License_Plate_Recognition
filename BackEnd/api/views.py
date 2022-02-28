@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, status
-from .models import LisencePlate, User
-from .serializers import LisencePlateSerializer, UserSerializer
+from .models import LicensePlate, User
+from .serializers import LicensePlateSerializer, UserSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 # from rest_framework.pagination import PageNumberPagination
@@ -45,9 +45,6 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 @api_view(["GET", ])
 def Routes(request):
-
-    domain = request.build_absolute_uri()
-
     routers = {
         "List License Plate": "/list-license-plate/",
         "Token": "/token/",
@@ -59,7 +56,6 @@ def Routes(request):
         "Update Check Out" :"/update-checkout/",
         "Delete": "/delete/<str:pk>/"
     }
-
     return Response(routers)
 
 
@@ -83,34 +79,32 @@ def Register(request):
     return Response(userSerializer.data)
 
 
-class ListLisencePlate(generics.ListAPIView):
 
+class ListLicensePlate(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    # queryset = LisencePlate.objects.all()
-    serializer_class = LisencePlateSerializer
+    
+    serializer_class = LicensePlateSerializer
     pagination_class = CustomPagination
 
     def get_queryset(self):
-
         user = self.request.user
         display = self.request.query_params.get("display")
         search = self.request.query_params.get("search")
-
         if display == "all":
-            lisencePlate = LisencePlate.objects.filter(
+            licensePlate = LicensePlate.objects.filter(
                 active=True, user__id=user.id)
             if search is None:
-                return lisencePlate
+                return licensePlate
             else:
-                return lisencePlate.filter(result__icontains=search)
+                return licensePlate.filter(result__icontains=search)
         elif display == "today":
             today = datetime.date.today()
-            lisencePlate = LisencePlate.objects.filter(active=True, user__id=user.id, created_date__year=today.year,
+            licensePlate = LicensePlate.objects.filter(active=True, user__id=user.id, created_date__year=today.year,
                                                        created_date__month=today.month, created_date__day=today.day)
             if search is None:
-                return lisencePlate
+                return licensePlate
             else:
-                return lisencePlate.filter(result__icontains=search)
+                return licensePlate.filter(result__icontains=search)
 
 
 @api_view(["POST", ])
@@ -121,12 +115,12 @@ def CheckIn(request):
         type_select = request.data['type']
 
         image_cv2 = base64_to_img(img_base64)
-        lisencePlate_confidence = cat_bien_so(image_cv2, net)
-        if lisencePlate_confidence is None:
+        licensePlate_confidence = cat_bien_so(image_cv2, net)
+        if licensePlate_confidence is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            img = lisencePlate_confidence[0]
-            confidence = lisencePlate_confidence[1]
+            img = licensePlate_confidence[0]
+            confidence = licensePlate_confidence[1]
             if type_select == 'daytime':
                 top_bot = lay_ki_tu(img, 'daytime')
             if type_select == 'evening':
@@ -139,10 +133,10 @@ def CheckIn(request):
                 userCurrent = User.objects.get(id=request.user.id)
 
                 # check duplicate
-                listLisencePlate = LisencePlate.objects.filter(active=True,
+                listLicensePlate = LicensePlate.objects.filter(active=True,
                                                                user__id=userCurrent.id, result=rs, status=True)
 
-                if len(listLisencePlate) > 0:
+                if len(listLicensePlate) > 0:
                     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
                 image_data = b64decode(img_to_base64(img))
@@ -151,12 +145,12 @@ def CheckIn(request):
                 # save in models
                 image = ContentFile(image_data, image_name)
 
-                lisencePlate = LisencePlate(image=image, confidences=confidence, result=rs,
+                licensePlate = LicensePlate(image=image, confidences=confidence, result=rs,
                                             user=userCurrent)
-                lisencePlate.save()
+                licensePlate.save()
 
-                obj_last = LisencePlate.objects.last()
-                serializer_obj = LisencePlateSerializer(
+                obj_last = LicensePlate.objects.last()
+                serializer_obj = LicensePlateSerializer(
                     obj_last, many=False, context={'request': request})
                 return Response(serializer_obj.data, status=status.HTTP_201_CREATED)
     except:
@@ -170,12 +164,12 @@ def CheckOut(request):
         img_base64 = request.data['base64']
         type_select = request.data['type']
         image_cv2 = base64_to_img(img_base64)
-        lisencePlate_confidence = cat_bien_so(image_cv2, net)
-        if lisencePlate_confidence is None:
+        licensePlate_confidence = cat_bien_so(image_cv2, net)
+        if licensePlate_confidence is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            img = lisencePlate_confidence[0]
-            confidence = lisencePlate_confidence[1]
+            img = licensePlate_confidence[0]
+            confidence = licensePlate_confidence[1]
             if type_select == 'daytime':
                 top_bot = lay_ki_tu(img, 'daytime')
             if type_select == 'evening':
@@ -185,15 +179,15 @@ def CheckOut(request):
                 bot = top_bot[1]
                 rs = predict_bienso(top, bot, model_chuso, model_chucai)
 
-            lisencePlate = LisencePlate.objects.filter(
+            licensePlate = LicensePlate.objects.filter(
                 active=True, status=True, result=rs, user__id=request.user.id)
-            if len(lisencePlate) > 0:
-                lisencePlate[0].status = False
-                lisencePlate[0].save()
-                lisencePlateSerializer = LisencePlateSerializer(
-                    lisencePlate[0])
+            if len(licensePlate) > 0:
+                licensePlate[0].status = False
+                licensePlate[0].save()
+                licensePlateSerializer = LicensePlateSerializer(
+                    licensePlate[0])
 
-                return Response(lisencePlateSerializer.data, status=status.HTTP_200_OK)
+                return Response(licensePlateSerializer.data, status=status.HTTP_200_OK)
 
             res = {
                 "image": "data:image/jpeg;base64,"+img_to_base64(img),
@@ -208,11 +202,11 @@ def CheckOut(request):
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def DeleteLicensePlate(request, pk):
-    lisencePlate = LisencePlate.objects.filter(
+    licensePlate = LicensePlate.objects.filter(
         id=pk, active=True, user__id=request.user.id)
-    if len(lisencePlate) > 0:
-        lisencePlate[0].active = False
-        lisencePlate[0].save()
+    if len(licensePlate) > 0:
+        licensePlate[0].active = False
+        licensePlate[0].save()
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_200_OK)
@@ -224,29 +218,49 @@ def UpdateCheckIn(request):
     id = request.data['id']
     result = request.data["result"]
 
-    lisencePlate = LisencePlate.objects.filter(
+    licensePlate = LicensePlate.objects.filter(
         id=id, active=True, status=True, user__id=request.user.id)
-    if len(lisencePlate) > 0:
+    if len(licensePlate) > 0:
 
-        lisencePlate[0].result = result
-        lisencePlate[0].save()
-        serializer = LisencePlateSerializer(lisencePlate[0])
+        licensePlate[0].result = result
+        licensePlate[0].save()
+        serializer = LicensePlateSerializer(licensePlate[0])
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def UpdateCheckOut(request):
     numberLP = request.data['result']
-    lisencePlate = LisencePlate.objects.filter(
+    licensePlate = LicensePlate.objects.filter(
         user__id=request.user.id, result=numberLP, status=True)
 
-    if len(lisencePlate) > 0:
-        lisencePlate[0].status = False
-        lisencePlate[0].save()
-        serializer = LisencePlateSerializer(lisencePlate[0])
+    if len(licensePlate) > 0:
+        licensePlate[0].status = False
+        licensePlate[0].save()
+        serializer = LicensePlateSerializer(licensePlate[0])
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def UpdateLicensePlate(request,pk):
+    try:
+        licensePlate = LicensePlate.objects.get(id=pk)
+        if request.data['status']=="true":
+            licensePlate.status = True
+        elif request.data['status']=="false":
+             licensePlate.status = False
+        licensePlate.result = request.data['result']
+        licensePlate.save()
+        return Response(LicensePlateSerializer(licensePlate).data,status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+

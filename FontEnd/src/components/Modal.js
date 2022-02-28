@@ -1,10 +1,45 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import "../styles/Modal.css"
+import { useSelector } from 'react-redux'
+import Apis, { endpoints } from '../configs/Apis'
+
 
 function Modal({ data, onRepair }) {
-    const handleSubmit = () => {
-        document.querySelector(".btn-secondary").click()
-        // onRepair(200)
+
+    const [result, setResult] = useState()
+    const [status, setStatus] = useState()
+
+    useEffect(() => {
+        setResult(data.result)
+        setStatus(data.status)
+    }, [data])
+
+    console.log(result, status)
+
+    const tokens = useSelector(state => state.authTokens)
+
+    const handleSubmit = async () => {
+        console.log(data.id)
+        try {
+            console.log("ok")
+            const res = await Apis.put(endpoints['update'](data.id), {
+                "result": result,
+                "status": status
+            },
+                {
+                    headers: {
+                        "Authorization": `Bearer ${tokens.access}`
+                    }
+                })
+            if (res.status === 200) {
+                onRepair(200)
+                document.querySelector(".btn-secondary").click()
+            }
+        }
+        catch {
+
+        }
+        // document.querySelector(".btn-secondary").click()
     }
 
     return (
@@ -14,7 +49,7 @@ function Modal({ data, onRepair }) {
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title" id="staticBackdropLabel">Modal title</h5>
+                        <h5 className="modal-title" id="staticBackdropLabel">Repair</h5>
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -40,12 +75,12 @@ function Modal({ data, onRepair }) {
                                         <img src={data.image} alt="" />
                                     </td>
                                     <td className="col-2">
-                                        <input className='txtResult' type="text" defaultValue={data.result} />
+                                        <input className='txtResult' type="text" value={result || ""} onChange={(e) => setResult(e.target.value)} />
                                     </td>
                                     <td className="col-2">
-                                        <select className="selectStatus" >
-                                            <option value={data.status}>{data.status ? "True" : "False"}</option>
-                                            <option value={!data.status}>{!data.status ? "True" : "False"}</option>
+                                        <select className="selectStatus" value={status} onChange={(e) => setStatus(e.target.value)}>
+                                            <option value="true">True</option>
+                                            <option value="false">False</option>
                                         </select>
                                     </td>
                                     <td className="col-2">{data.confidences + " %"}</td>

@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 # Ceate your models here.
 
 
-class LisencePlate(models.Model):
+class LicensePlate(models.Model):
     image = models.ImageField(upload_to='images/%Y/%m/%d')
     confidences = models.FloatField()
     result = models.CharField(max_length=10)

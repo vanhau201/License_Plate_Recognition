@@ -1,11 +1,11 @@
 
 from rest_framework.serializers import ModelSerializer
-from .models import LisencePlate, User
+from .models import LicensePlate, User
 
 
-class LisencePlateSerializer(ModelSerializer):
+class LicensePlateSerializer(ModelSerializer):
     class Meta:
-        model = LisencePlate
+        model = LicensePlate
         fields = ["id", "image", "confidences",
                   "result", "status", "created_date"]
         # fields = "__all__"

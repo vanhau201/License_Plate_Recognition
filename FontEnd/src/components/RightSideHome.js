@@ -81,6 +81,7 @@ function RightSideHome({ licensePlate }) {
     const handleRepair = (status) => {
         if (status === 200) {
             loadData()
+            toast.success("Repair success !")
         }
     }
     return (

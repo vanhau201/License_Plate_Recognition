@@ -7,7 +7,7 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('', views.Routes),
-    path('list-license-plate/', views.ListLisencePlate.as_view()),
+    path('list-license-plate/', views.ListLicensePlate.as_view()),
     path('token/', views.MyTokenObtainPairView.as_view(),
          name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
@@ -17,5 +17,6 @@ urlpatterns = [
     path('delete/<str:pk>/', views.DeleteLicensePlate),
     path('update-checkin/', views.UpdateCheckIn),
     path('update-checkout/', views.UpdateCheckOut),
+    path('update/<str:pk>/', views.UpdateLicensePlate),
 
 ]
