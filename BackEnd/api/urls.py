@@ -18,5 +18,7 @@ urlpatterns = [
     path('update-checkin/', views.UpdateCheckIn),
     path('update-checkout/', views.UpdateCheckOut),
     path('update/<str:pk>/', views.UpdateLicensePlate),
+    path('statistics/', views.Statistics),
+
 
 ]

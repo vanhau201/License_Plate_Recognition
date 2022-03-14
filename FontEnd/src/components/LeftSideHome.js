@@ -43,10 +43,9 @@ function LeftSideHome({ sendData }) {
 
     // stop video/webcam
     const handleStopWebCam = () => {
-        const video = videoRef.current
+        let video = videoRef.current
 
-
-        if (video.srcObject != null) {
+        if (video.srcObject !== null) {
             video.srcObject.getTracks()[0].stop()
             video.srcObject = null;
             video.pause();

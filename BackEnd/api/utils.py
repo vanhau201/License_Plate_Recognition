@@ -208,3 +208,12 @@ def predict_bienso(top, bot, model_chuso, model_chucai):
     rs_bot = np.argmax(rs_bot, axis=1)
     rs += "".join(labels[i] for i in rs_bot)
     return rs
+
+
+import datetime
+
+def getListDay(start,end):
+    arr = []
+    for i in range(1,(end-start).days+1):
+       arr.append(start+datetime.timedelta(i))
+    return arr

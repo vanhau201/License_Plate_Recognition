@@ -1,3 +1,4 @@
+import statistics
 from unittest import result
 from urllib import response
 from django.shortcuts import render
@@ -11,7 +12,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 # from rest_framework.pagination import PageNumberPagination
 from .Paginator import CustomPagination
-from .utils import base64_to_img, cat_bien_so, lay_ki_tu, predict_bienso, img_to_base64
+from .utils import base64_to_img, cat_bien_so, lay_ki_tu, predict_bienso, img_to_base64,getListDay
 import cv2
 import tensorflow as tf
 import uuid
@@ -21,6 +22,7 @@ import time
 import datetime
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+from django.db.models import Count
 # load model DL
 net = cv2.dnn.readNet('./models/yolov4-tiny.cfg',
                       './models/yolov4-tiny_3000.weights')
@@ -261,6 +263,66 @@ def UpdateLicensePlate(request,pk):
         return Response(LicensePlateSerializer(licensePlate).data,status=status.HTTP_200_OK)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def Statistics(request):
+    # /////
+    userID = request.user.id
+    today = datetime.date.today()
+    today_obj = LicensePlate.objects.filter(user__id=userID, created_date__year=today.year,
+                                     created_date__month=today.month, created_date__day=today.day)
+    thisMonth = LicensePlate.objects.filter(user__id=userID, created_date__year=today.year,
+                                     created_date__month=today.month)
+    thisYear = LicensePlate.objects.filter(user__id=userID, created_date__year=today.year)
+
+    statusTrue = LicensePlate.objects.filter(user__id=userID, status=True)
+
+    statistics = {
+        "quantity_true": len(statusTrue),
+        "quantity_today": len(today_obj),
+        "quantity_month": len(thisMonth),
+        "quantity_year": len(thisYear),
+    }
+    # //////
+
+
+    query = LicensePlate.objects.filter(user__id=userID, 
+        created_date__gte=datetime.date.today()-datetime.timedelta(7)) \
+        .extra(select={'day': 'date( created_date )'}).values("day") \
+        .annotate(count = Count("created_date")) \
+        .order_by()
+
+    end = datetime.date.today()
+    start = (datetime.date.today() - datetime.timedelta(7))
+    listDay = getListDay(start,end)
+
+    line_chart = {str(i):0 for i in listDay}
+    
+
+    for i in query:
+        if str(i["day"]) in line_chart.keys():
+           line_chart[str(i["day"])] = i["count"]
+               
+    statistics["line_chart"] = line_chart
+
+    #////////////////////////
+
+    bar_chart = {}
+    for i in [today.year, today.year-1, today.year-2]:
+        months = {}
+        for j in range(1, 13):
+            data_month = LicensePlate.objects.filter(user__id=userID, created_date__year=i,
+                                              created_date__month=j)
+            months[j] = len(data_month)
+
+        bar_chart[i] = months
+
+    statistics["bar_chart"] = bar_chart
+    
+
+    return Response(statistics,status=status.HTTP_200_OK)
 
 
 

@@ -9,7 +9,8 @@ export let endpoints = {
     "updateCheckIn": "api/update-checkin/",
     "updateCheckOut": "api/update-checkout/",
     "delete": (id) => `api/delete/${id}/`,
-    "update": (id) => `api/update/${id}/`
+    "update": (id) => `api/update/${id}/`,
+    "statistics": "api/statistics/"
 }
 
 export default axios.create({
